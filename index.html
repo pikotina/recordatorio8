@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorios con Voz</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icono.png" type="image/png">
+</head>
+<body>
+    <!-- Alerta de red -->
+    <div id="alerta-red" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center;">
+        ⚠️ Sin conexión a internet. La función de voz no funcionará.
+    </div>
+
+    <header>
+        <h1>📅 Recordatorios</h1>
+    </header>
+
+    <main class="contenedor">
+        <div class="fila">
+            <input type="text" id="tarea" placeholder="Escribe o graba tu recordatorio">
+            <button id="btn-grabar" onclick="toggleGrabar()">
+                <img src="grabadora-de-voz.png" alt="Grabar" class="icono-mic">
+            </button>
+        </div>
+
+        <div class="fila">
+            <input type="date" id="fecha" value="2025-03-07">
+            <button onclick="agregarRecordatorio()">+ Agregar</button>
+        </div>
+
+        <div class="fila recurrente-container">
+            <label class="opcion-recurrente">
+                <input type="checkbox" id="recurrente"> Recurrente
+            </label>
+            <select id="intervalo" disabled>
+                <option value="1">1 año</option>
+                <option value="2">2 años</option>
+                <option value="3">3 años</option>
+                <option value="4">4 años</option>
+                <option value="5">5 años</option>
+            </select>
+        </div>
+    </main>
+
+    <section class="lista">
+        <h2>📌 Mis Recordatorios</h2>
+        <div id="recordatorios"></div>
+    </section>
+
+    <div class="modal" id="ventanaRecordatorio">
+        <div class="contenido-modal">
+            <h2 id="tituloRecordatorio">📅 Hoy tienes:</h2>
+            <div id="contenidoRecordatorio"></div>
+            <button onclick="cerrarVentana()">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
