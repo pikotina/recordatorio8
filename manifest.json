@@ -1,20 +1,29 @@
 {
   "name": "Recordatorios",
   "short_name": "Recordatorios",
-  "start_url": "/",
+  "description": "Aplicación para gestionar recordatorios con voz y notificaciones push.",
+  "id": "recordatorios-app",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#6A1B9A",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
+      "src": "icono.png",
+      "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
+      "src": "icono.png",
+      "sizes": "192x192",
       "type": "image/png"
     }
-  ]
+  ],
+  "permissions": ["microphone"],
+  "categories": ["productivity"],
+  "scope": "/",
+  "prefer_related_applications": false
 }
