@@ -2,54 +2,69 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recordatorios con Voz</title>
+    <meta name="theme-color" content="#6A1B9A">
+    <title>📅 Recordatorios con Voz</title>
+    
+    <!-- CSS y Manifest -->
     <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icono.png" type="image/png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon-192.png" type="image/png">
+    
+    <!-- Forzar HTTPS -->
+    <script>
+      if(location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        location.replace(`https://${location.hostname}${location.pathname}`);
+      }
+    </script>
 </head>
 <body>
-    <!-- Alerta de red -->
-    <div id="alerta-red" style="display: none; background: #ff9800; color: white; padding: 10px; text-align: center;">
+    <!-- Alerta de conexión -->
+    <div id="alerta-red" class="notification">
         ⚠️ Sin conexión a internet. La función de voz no funcionará.
     </div>
 
     <header>
-        <h1>📅 Recordatorios</h1>
+        <h1>📅 Mis Recordatorios</h1>
     </header>
 
     <main class="contenedor">
+        <!-- Input principal -->
         <div class="fila">
             <input type="text" id="tarea" placeholder="Escribe o graba tu recordatorio">
             <button id="btn-grabar" onclick="toggleGrabar()">
-                <img src="grabadora-de-voz.png" alt="Grabar" class="icono-mic">
+                <img src="/grabadora-de-voz.png" alt="Grabar" class="icono-mic">
             </button>
         </div>
 
+        <!-- Fecha y botón de agregar -->
         <div class="fila">
-            <input type="date" id="fecha" value="2025-03-07">
+            <input type="date" id="fecha" min="2023-01-01">
             <button onclick="agregarRecordatorio()">+ Agregar</button>
         </div>
 
+        <!-- Opciones recurrentes -->
         <div class="fila recurrente-container">
             <label class="opcion-recurrente">
-                <input type="checkbox" id="recurrente"> Recurrente
+                <input type="checkbox" id="recurrente" onchange="toggleRecurrente()">
+                Recurrente
             </label>
             <select id="intervalo" disabled>
                 <option value="1">1 año</option>
                 <option value="2">2 años</option>
                 <option value="3">3 años</option>
-                <option value="4">4 años</option>
-                <option value="5">5 años</option>
             </select>
         </div>
     </main>
 
+    <!-- Lista de recordatorios -->
     <section class="lista">
-        <h2>📌 Mis Recordatorios</h2>
-        <div id="recordatorios"></div>
+        <h2>📌 Pendientes</h2>
+        <div id="recordatorios" class="lista-recordatorios"></div>
     </section>
 
+    <!-- Ventana emergente -->
     <div class="modal" id="ventanaRecordatorio">
         <div class="contenido-modal">
             <h2 id="tituloRecordatorio">📅 Hoy tienes:</h2>
@@ -58,6 +73,15 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script>
+      // Registrar Service Worker
+      if('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('SW registrado:', reg))
+          .catch(err => console.error('Error SW:', err));
+      }
+    </script>
+    <script src="/script.js"></script>
 </body>
 </html>
