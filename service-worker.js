@@ -1,86 +1,55 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+// 1. Importar Workbox (versión actualizada)
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
 
-const CACHE_NAME = 'recordatorios-v3';
+const CACHE_NAME = 'recordatorios-v4';
 const urlsToCache = [
     '/',
     '/index.html',
     '/styles.css',
     '/script.js',
     '/manifest.json',
-    '/icono.png',
+    '/icon-192.png', // Asegúrate de que el nombre coincida con tus iconos
+    '/icon-512.png',
     '/grabadora-de-voz.png'
 ];
 
-const offlineFallbackPage = "/index.html";
+// 2. Configurar Workbox
+workbox.setConfig({ debug: false });
+workbox.core.setLogLevel(workbox.core.LOG_LEVELS.warn);
 
-self.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "SKIP_WAITING") {
-        self.skipWaiting();
-    }
-});
+// 3. Estrategia de caché
+workbox.routing.registerRoute(
+    /\.(?:html|css|js|json|png|jpg|svg)$/,
+    new workbox.strategies.StaleWhileRevalidate({
+        cacheName: CACHE_NAME,
+        plugins: [
+            new workbox.expiration.ExpirationPlugin({
+                maxEntries: 50,
+                purgeOnQuotaError: true
+            })
+        ]
+    })
+);
 
-self.addEventListener('install', event => {
-    self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(urlsToCache))
-    );
-});
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cache => {
-                    if (cache !== CACHE_NAME) return caches.delete(cache);
-                })
-            );
-        })
-    );
-});
-
-self.addEventListener('fetch', event => {
-    if (event.request.mode === 'navigate') {
-        event.respondWith((async () => {
-            try {
-                const preloadResp = await event.preloadResponse;
-                if (preloadResp) return preloadResp;
-                return await fetch(event.request);
-            } catch (error) {
-                const cache = await caches.open(CACHE_NAME);
-                return await cache.match(offlineFallbackPage);
-            }
-        })());
-    } else {
-        event.respondWith(
-            caches.match(event.request)
-                .then(response => response || fetch(event.request))
-        );
-    }
-});
-
+// 4. Control de notificaciones push
 self.addEventListener('push', event => {
-    const data = event.data ? event.data.json() : {};
-    event.waitUntil(
-        self.registration.showNotification(data.titulo || "Recordatorio", {
-            body: data.cuerpo || "Tienes un recordatorio pendiente",
-            icon: '/icono.png'
-        })
-    );
+    const data = event.data?.json() || {};
+    const options = {
+        body: data.body || 'Tienes un recordatorio pendiente',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        data: { url: data.url || '/' }
+    };
+    event.waitUntil(self.registration.showNotification(data.title || 'Recordatorio', options));
 });
 
+// 5. Acción al hacer click en la notificación
 self.addEventListener('notificationclick', event => {
     event.notification.close();
-    event.waitUntil(
-        clients.openWindow('/')
-    );
+    event.waitUntil(clients.openWindow(event.notification.data.url));
 });
 
+// 6. Control de actualizaciones
 self.addEventListener('message', event => {
-    if (event.data && event.data.titulo) {
-        self.registration.showNotification(event.data.titulo, {
-            body: event.data.cuerpo,
-            icon: '/icono.png'
-        });
-    }
+    if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
